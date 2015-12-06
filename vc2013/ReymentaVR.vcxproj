@@ -126,6 +126,7 @@ xcopy /y "..\..\..\blocks\Cinder-Spout\lib\SpoutPanel.exe" "$(OutDir)"</Command>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ClInclude Include="..\include\AppConsole.h" />
     <ClInclude Include="..\include\Resources.h" />
     <ClInclude Include="..\..\..\blocks\Cinder-Hap2\src\HapSupport.h" />
     <ClInclude Include="..\..\..\blocks\Cinder-Hap2\src\MovieHap.h" />
@@ -186,6 +187,7 @@ xcopy /y "..\..\..\blocks\Cinder-Spout\lib\SpoutPanel.exe" "$(OutDir)"</Command>
     <ClInclude Include="..\include\ReymentaVRApp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AppConsole.cpp" />
     <ClCompile Include="..\src\ReymentaVRApp.cpp" />
     <ClCompile Include="..\..\..\blocks\Cinder-Hap2\src\MovieHap.cpp" />
     <ClCompile Include="..\..\..\blocks\Cinder-Hap2\src\HapSupport.c" />
