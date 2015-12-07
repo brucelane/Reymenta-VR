@@ -121,10 +121,9 @@ xcopy /y "..\..\..\blocks\Cinder-Spout\lib\SpoutPanel.exe" "$(OutDir)"</Command>
     <ResourceCompile Include="Resources.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\assets\phong.frag" />
-    <None Include="..\assets\phong.vert" />
+    <None Include="..\..\..\..\..\assets\phong.frag" />
+    <None Include="..\..\..\..\..\assets\phong.vert" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ClInclude Include="..\include\AppConsole.h" />
     <ClInclude Include="..\include\Resources.h" />

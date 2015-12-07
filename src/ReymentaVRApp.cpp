@@ -99,7 +99,7 @@ void ReymentaVRApp::setup()
 void ReymentaVRApp::update()
 {
 	//mSpout->update();
-	//mBatchass->update();
+	mBatchass->update();
 	mAudio->update();
 	mParameterBag->iFps = getAverageFps();
 	mParameterBag->sFps = toString(floor(mParameterBag->iFps));
@@ -111,7 +111,7 @@ void ReymentaVRApp::update()
 	if (mChannel3) mChannel3->bind(3);
 
 	// Render the current shader to a frame buffer.
-	if (mBatchass->getShadersRef()->getShaderCurrent() && mBufferCurrent) {
+	/*if (mBatchass->getShadersRef()->getShaderCurrent() && mBufferCurrent) {
 		gl::ScopedFramebuffer fbo(mBufferCurrent);
 
 		// Bind shader.
@@ -121,10 +121,10 @@ void ReymentaVRApp::update()
 		// Clear buffer and draw full screen quad (flipped).
 		gl::clear();
 		gl::drawSolidRect(Rectf(0, (float)getWindowHeight(), (float)getWindowWidth(), 0));
-	}
+		}
 
-	// Render the next shader to a frame buffer.
-	if (mBatchass->getShadersRef()->getShaderNext() && mBufferNext) {
+		// Render the next shader to a frame buffer.
+		if (mBatchass->getShadersRef()->getShaderNext() && mBufferNext) {
 		gl::ScopedFramebuffer fbo(mBufferNext);
 
 		// Bind shader.
@@ -134,17 +134,17 @@ void ReymentaVRApp::update()
 		// Clear buffer and draw full screen quad (flipped).
 		gl::clear();
 		gl::drawSolidRect(Rectf(0, (float)getWindowHeight(), (float)getWindowWidth(), 0));
-	}
+		}
 
-	// Perform a cross-fade between the two shaders.
-	double time = getElapsedSeconds() - mParameterBag->mTransitionTime;
-	double fade = math<double>::clamp(time / mParameterBag->mTransitionDuration, 0.0, 1.0);
+		// Perform a cross-fade between the two shaders.
+		double time = getElapsedSeconds() - mParameterBag->mTransitionTime;
+		double fade = math<double>::clamp(time / mParameterBag->mTransitionDuration, 0.0, 1.0);
 
-	if (fade <= 0.0) {
+		if (fade <= 0.0) {
 		// Transition has not yet started. Keep drawing current buffer.
 		gl::draw(mBufferCurrent->getColorTexture(), getWindowBounds());
-	}
-	else if (fade < 1.0) {
+		}
+		else if (fade < 1.0) {
 		// Transition is in progress.
 		// Use a transition shader to avoid having to draw one buffer on top of another.
 		gl::ScopedTextureBind tex0(mBufferCurrent->getColorTexture(), 0);
@@ -156,17 +156,17 @@ void ReymentaVRApp::update()
 		mShaderTransition->uniform("iFade", (float)fade);
 
 		gl::drawSolidRect(getWindowBounds());
-	}
-	else if (mBatchass->getShadersRef()->getShaderNext()) {
+		}
+		else if (mBatchass->getShadersRef()->getShaderNext()) {
 		// Transition is done. Swap shaders.
 		gl::draw(mBufferNext->getColorTexture(), getWindowBounds());
 		mBatchass->getShadersRef()->swapShaders();
 
-	}
-	else {
+		}
+		else {
 		// No transition in progress.
 		gl::draw(mBufferCurrent->getColorTexture(), getWindowBounds());
-	}
+		}*/
 	// rift
 	mTime = getElapsedSeconds();
 	gl::clear();
@@ -174,19 +174,33 @@ void ReymentaVRApp::update()
 	hmd::ScopedRiftBuffer bind{ mRift };
 	std::array<mat4, 6> worldToEyeClipMatrices;
 
-	// Calc clip space conversion matrices for both eyes
-	for (auto eye : mRift->getEyes()) {
-		gl::ScopedMatrices push;
-		mRift->enableEye(eye);
-		auto idx = 3 * static_cast<size_t>(eye);
-		worldToEyeClipMatrices.at(idx) = mRift->getViewMatrix() * mRift->getModelMatrix();
-		worldToEyeClipMatrices.at(idx + 1) = mRift->getProjectionMatrix();
+	if (mBatchass->getShadersRef()->getShaderNext() && mBufferNext) {
+		//gl::ScopedFramebuffer fbo(mBufferNext);
 
-		// non-instanced scene
-		gl::lineWidth(3.0f);
-		gl::drawCoordinateFrame(2);
-		gl::drawSphere(vec3(mLightWorldPosition), 0.05f, 36);
-	}
+		// Bind shader.
+
+/*
+		// Clear buffer and draw full screen quad (flipped).
+		//gl::clear();
+		gl::drawSolidRect(Rectf(0, (float)getWindowHeight()/4, (float)getWindowWidth()/4, 0));*/
+		// Bind shader.
+		gl::ScopedGlslProg shader(mBatchass->getShadersRef()->getShaderNext());
+		setUniforms();
+		//gl::draw(mBufferNext->getColorTexture(), getWindowBounds());
+
+		// Calc clip space conversion matrices for both eyes
+		for (auto eye : mRift->getEyes()) {
+			gl::ScopedMatrices push;
+			mRift->enableEye(eye);
+			auto idx = 3 * static_cast<size_t>(eye);
+			worldToEyeClipMatrices.at(idx) = mRift->getViewMatrix() * mRift->getModelMatrix();
+			worldToEyeClipMatrices.at(idx + 1) = mRift->getProjectionMatrix();
+
+			// non-instanced scene
+			gl::lineWidth(3.0f);
+			gl::drawCoordinateFrame(2);
+			gl::drawSphere(vec3(mLightWorldPosition), 0.05f, 36);
+		}
 
 	{
 		gl::ScopedViewport port{ vec2(0), mRift->getFboSize() };
@@ -200,6 +214,7 @@ void ReymentaVRApp::update()
 		mShader->uniform("uLightPosition", mLightWorldPosition);
 		mShader->uniform("uWorldToEyeClipMatrices", worldToEyeClipMatrices.data(), 6);
 		mTeapot->drawInstanced(2);
+	}
 	}
 
 }
